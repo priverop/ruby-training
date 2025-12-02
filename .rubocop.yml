@@ -6,9 +6,6 @@ AllCops:
 Metrics/MethodLength:
   CountAsOne: "hash"
 
-RSpec/ExampleLength:
-  CountAsOne: "hash"
-
 Metrics/BlockLength:
   Exclude:
     - "**/*"
