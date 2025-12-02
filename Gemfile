@@ -5,6 +5,6 @@ source 'https://rubygems.org'
 group :development, :test do
   gem 'debug', '>= 1.0.0'
   gem 'minitest'
-  gem 'rubocop'
   gem 'rake'
+  gem 'rubocop'
 end
