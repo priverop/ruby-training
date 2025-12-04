@@ -12,9 +12,9 @@ module Tournament
       # Método que dada la linea, devuelve los resultados (puntos)
       ranking = result(ranking, line.strip.split(';'))
     end
-    puts "Ending ranking:"
+    puts 'Ending ranking:'
     p ranking
-    puts ""
+    puts ''
     # print ranking - with header
     print_ranking(ranking)
   end
@@ -27,8 +27,8 @@ module Tournament
 
   # Allegoric Alaskans;Blithering Badgers;win
   def self.result(ranking, array)
-    puts ""
-    puts "Single Result: "
+    puts ''
+    puts 'Single Result: '
     local_team = array[0]
     p local_team
     visitant_team = array[1]
@@ -59,8 +59,8 @@ module Tournament
     else
       raise StandardError, 'Condition not found'
     end
-    puts "--"
-    puts ""
+    puts '--'
+    puts ''
     ranking
   end
 
@@ -82,6 +82,5 @@ module Tournament
     HEADER
   end
 
-  def self.sort_ranking
-  end
+  def self.sort_ranking; end
 end
