@@ -5,6 +5,7 @@ require_relative 'tournament'
 
 input = <<~INPUT
       Allegoric Alaskans;Blithering Badgers;win
+      Allegoric Alaskans;Blithering Badgers;win
     INPUT
 
 p Tournament.tally(input)

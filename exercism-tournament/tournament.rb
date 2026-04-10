@@ -2,26 +2,32 @@
 
 # Tournament manager
 module Tournament
+  TITLE_SIZE = 31
+  POINTS_SIZE = 3
+
   def self.tally(input)
     return header if input.strip.empty?
 
     ranking = {}
 
     # Hay que iterar el input para ir almacenando los resultados (puntos)
-    input.split('\n').each do |line|
+    input.split("\n").each do |line|
       # Método que dada la linea, devuelve los resultados (puntos)
       ranking = result(ranking, line.strip.split(';'))
     end
     puts 'Ending ranking:'
     p ranking
     puts ''
-    # print ranking - with header
-    print_ranking(ranking)
+    sorted_ranking = ranking.sort_by { |team_name, results| [-results[:points], team_name] }
+    puts "sorted ranking:"
+    p sorted_ranking
+    puts ''
+    print_ranking(sorted_ranking)
   end
 
   def self.header
     <<~HEADER
-      Team                           | MP |  W |  D |  L |  P
+      Team#{title_spaces("Team")}| MP |  W |  D |  L |  P
     HEADER
   end
 
@@ -78,9 +84,17 @@ module Tournament
 
   def self.print_single_team_rank(team_name, results)
     <<~HEADER
-      #{team_name}             |  #{results[:played]} |  #{results[:wins]} |  #{results[:draws]} |  #{results[:loses]} |  #{results[:points]}
+      #{team_name}#{title_spaces(team_name)}|  #{results[:played]} |  #{results[:wins]} |  #{results[:draws]} |  #{results[:loses]} |#{points_spaces(results[:points])}#{results[:points]}
     HEADER
   end
 
-  def self.sort_ranking; end
+  def self.title_spaces(team_name)
+    space_number = TITLE_SIZE - team_name.size
+    " " * space_number
+  end
+
+  def self.points_spaces(points)
+    space_number = POINTS_SIZE - points.to_s.size
+    " " * space_number
+  end
 end
