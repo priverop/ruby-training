@@ -29,8 +29,8 @@ RSpec.describe VendingMachine do
     end
 
     context 'when passing a not valid coin' do
-      it 'returns false' do
-        expect(machine.insert_coin(0)).to be false
+      it 'raises CoinValueNotSupportedException' do
+        expect { machine.insert_coin(0) }.to raise_error(VendingMachine::CoinValueNotSupportedException, "Coin value '0' not supported.")
       end
     end
 
@@ -44,7 +44,7 @@ RSpec.describe VendingMachine do
         machine.insert_coin(20)
 
         result = machine.select_product('chips')
-        expect(result).to eq({ product: 'chips', change: [] })
+        expect(result).to eq({ product: 'chips', change: [], status: :success })
       end
 
       it 'decreases the machine total amount' do
@@ -76,12 +76,10 @@ RSpec.describe VendingMachine do
         )
       end
 
-      it 'raises NoStockException' do
+      it 'returns a hash with change and error message' do
         no_stock_machine.insert_coin(100)
         no_stock_machine.insert_coin(20)
-        expect do
-          no_stock_machine.select_product('chips')
-        end.to raise_error(VendingMachine::NoStockException, "product 'chips' is out of stock.")
+        expect(no_stock_machine.select_product('chips')).to eq({ change: [100, 20], message: "product 'chips' is out of stock.", status: :out_of_stock })
       end
     end
 
@@ -94,42 +92,39 @@ RSpec.describe VendingMachine do
         )
       end
 
-      it 'raises NoStockException' do
+      before do
         no_stock_machine.insert_coin(100)
         no_stock_machine.insert_coin(20)
         no_stock_machine.select_product('chips')
         no_stock_machine.insert_coin(100)
         no_stock_machine.insert_coin(20)
         no_stock_machine.select_product('chips')
+      end
+
+      it 'returns the coins and out_of_stock status' do
         no_stock_machine.insert_coin(100)
         no_stock_machine.insert_coin(20)
-        expect do
-          no_stock_machine.select_product('chips')
-        end.to raise_error(VendingMachine::NoStockException, "product 'chips' is out of stock.")
+        expect(no_stock_machine.select_product('chips')).to eq({ change: [100, 20], message: "product 'chips' is out of stock.", status: :out_of_stock })
       end
     end
 
     context 'when the machine has no coins' do
-      it 'raises InsufficientFundsException' do
-        expect do
-          machine.select_product('chips')
-        end.to raise_error(VendingMachine::InsufficientFundsException, 'machine has no funds, please insert coins')
+      it 'returns empty change and error message' do
+        expect(machine.select_product('chips')).to eq({ change: [], message: 'not enough funds.', status: :insufficient_funds })
       end
     end
 
     context 'when the machine has not enough coins for the product' do
-      it 'raises InsufficientFundsException' do
+      it 'returns change and error message' do
         machine.insert_coin(100)
-        expect do
-          machine.select_product('chips')
-        end.to raise_error(VendingMachine::InsufficientFundsException, 'not enough funds, please insert 20 more.')
+        expect(machine.select_product('chips')).to eq({ change: [100], message: 'not enough funds.', status: :insufficient_funds })
       end
     end
   end
 
   describe '#cancel' do
     context 'when the machine has coins' do
-      it 'returns all the coins' do
+      before do
         machine.insert_coin(200)
         machine.insert_coin(50)
         machine.insert_coin(20)
@@ -138,7 +133,10 @@ RSpec.describe VendingMachine do
         machine.insert_coin(20)
         machine.insert_coin(10)
         machine.insert_coin(5)
-        expect(machine.cancel).to eq({ change: [200, 100, 20, 20, 5] })
+      end
+
+      it 'returns all the coins' do
+        expect(machine.cancel).to eq({ change: [200, 100, 20, 20, 5], status: :cancelled })
       end
 
       it 'empties the machine coins' do
@@ -150,7 +148,7 @@ RSpec.describe VendingMachine do
 
     context 'when the machine has no coins' do
       it 'returns empty change' do
-        expect(machine.cancel).to eq({ change: [] })
+        expect(machine.cancel).to eq({ change: [], status: :cancelled })
       end
     end
   end

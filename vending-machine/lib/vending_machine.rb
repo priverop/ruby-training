@@ -7,7 +7,7 @@ require_relative 'product'
 # Inventory: Array of Products.
 # Total_amount: Int, sum of the value of all the inserted coins. Default: 0
 class VendingMachine
-  class InsufficientFundsException < StandardError; end
+  class CoinValueNotSupportedException < StandardError; end
   class NoStockException < StandardError; end
   class ProductErrorException < StandardError; end
 
@@ -19,56 +19,75 @@ class VendingMachine
   end
 
   def insert_coin(coin_value) # rubocop:disable Naming/PredicateMethod
-    return false unless CoinValues::COIN_VALUES.include?(coin_value) # TODO: exception?
+    unless coin_value.is_a?(Integer) && CoinValues::COIN_VALUES.include?(coin_value)
+      raise CoinValueNotSupportedException, "Coin value '#{coin_value}' not supported."
+    end
 
     @total_amount += coin_value
     true
   end
 
   def select_product(name)
-    raise InsufficientFundsException, 'machine has no funds, please insert coins' unless @total_amount.positive?
-
     product = @inventory.find { |product| product.name == name }
 
     raise ProductErrorException, "product '#{name}' not found." unless product
-    raise NoStockException, "product '#{name}' is out of stock." unless product.quantity.positive?
+    return out_of_stock(name) unless product.quantity.positive?
 
-    raise InsufficientFundsException, "not enough funds, please insert #{product.price - @total_amount} more." if @total_amount < product.price
+    return insufficient_funds if @total_amount < product.price
 
     product.quantity -= 1
     @total_amount -= product.price
-    change_for_user = change
-    @total_amount = 0
 
-    { product: product.name, change: change_for_user}
+    dispense_product(product)
   end
 
   def cancel
-    change_for_user = change
-    @total_amount = 0
-
-    { change: change_for_user }
+    dispense(status: :cancelled)
   end
 
   private
+
+  def reset_total_amount
+    @total_amount = 0
+  end
 
   def change
     return [] if @total_amount.zero?
 
     change = []
     index = CoinValues::COIN_VALUES.count - 1
+    current_amount = @total_amount
 
     while index >= 0
       coin_value = CoinValues::COIN_VALUES[index]
 
-      if @total_amount >= coin_value
+      if current_amount >= coin_value
         change << coin_value
-        @total_amount -= coin_value
+        current_amount -= coin_value
       else
         index -= 1
       end
     end
 
     change
+  end
+
+  def out_of_stock(name)
+    dispense(message: "product '#{name}' is out of stock.", status: :out_of_stock)
+  end
+
+  def insufficient_funds
+    dispense(message: 'not enough funds.', status: :insufficient_funds)
+  end
+
+  def dispense_product(product)
+    dispense(product: product.name, status: :success)
+  end
+
+  def dispense(status:, **extra)
+    change_for_user = change
+    reset_total_amount
+
+    { change: change_for_user, status:, **extra }
   end
 end
