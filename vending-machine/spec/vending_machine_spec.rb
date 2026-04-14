@@ -96,11 +96,13 @@ RSpec.describe VendingMachine do
 
       it 'raises NoStockException' do
         no_stock_machine.insert_coin(100)
-        no_stock_machine.insert_coin(100)
-        no_stock_machine.insert_coin(100)
-        no_stock_machine.insert_coin(100)
+        no_stock_machine.insert_coin(20)
         no_stock_machine.select_product('chips')
+        no_stock_machine.insert_coin(100)
+        no_stock_machine.insert_coin(20)
         no_stock_machine.select_product('chips')
+        no_stock_machine.insert_coin(100)
+        no_stock_machine.insert_coin(20)
         expect do
           no_stock_machine.select_product('chips')
         end.to raise_error(VendingMachine::NoStockException, "product 'chips' is out of stock.")
@@ -128,8 +130,15 @@ RSpec.describe VendingMachine do
   describe '#cancel' do
     context 'when the machine has coins' do
       it 'returns all the coins' do
-        machine.insert_coin(100)
-        expect(machine.cancel).to eq({ change: [100] })
+        machine.insert_coin(200)
+        machine.insert_coin(50)
+        machine.insert_coin(20)
+        machine.insert_coin(20)
+        machine.insert_coin(20)
+        machine.insert_coin(20)
+        machine.insert_coin(10)
+        machine.insert_coin(5)
+        expect(machine.cancel).to eq({ change: [200, 100, 20, 20, 5] })
       end
 
       it 'empties the machine coins' do

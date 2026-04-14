@@ -37,8 +37,10 @@ class VendingMachine
 
     product.quantity -= 1
     @total_amount -= product.price
+    change_for_user = change
+    @total_amount = 0
 
-    { product: product.name, change: }
+    { product: product.name, change: change_for_user}
   end
 
   def cancel
@@ -50,10 +52,23 @@ class VendingMachine
 
   private
 
-  # TODO: algorithm for change
   def change
     return [] if @total_amount.zero?
 
-    [@total_amount]
+    change = []
+    index = CoinValues::COIN_VALUES.count - 1
+
+    while index >= 0
+      coin_value = CoinValues::COIN_VALUES[index]
+
+      if @total_amount >= coin_value
+        change << coin_value
+        @total_amount -= coin_value
+      else
+        index -= 1
+      end
+    end
+
+    change
   end
 end
