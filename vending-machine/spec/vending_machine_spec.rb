@@ -120,7 +120,7 @@ RSpec.describe VendingMachine do
         machine.insert_coin(100)
         expect do
           machine.select_product('chips')
-        end.to raise_error(VendingMachine::InsufficientFundsException, 'not enough founds, please insert 20 more.')
+        end.to raise_error(VendingMachine::InsufficientFundsException, 'not enough funds, please insert 20 more.')
       end
     end
   end
@@ -130,6 +130,12 @@ RSpec.describe VendingMachine do
       it 'returns all the coins' do
         machine.insert_coin(100)
         expect(machine.cancel).to eq({ change: [100] })
+      end
+
+      it 'empties the machine coins' do
+        machine.insert_coin(100)
+        machine.cancel
+        expect(machine.total_amount).to eq(0)
       end
     end
 

@@ -33,17 +33,19 @@ class VendingMachine
     raise ProductErrorException, "product '#{name}' not found." unless product
     raise NoStockException, "product '#{name}' is out of stock." unless product.quantity.positive?
 
+    raise InsufficientFundsException, "not enough funds, please insert #{product.price - @total_amount} more." if @total_amount < product.price
+
     product.quantity -= 1
-
-    raise InsufficientFundsException, "not enough founds, please insert #{product.price - @total_amount} more." if @total_amount < product.price
-
     @total_amount -= product.price
 
     { product: product.name, change: }
   end
 
   def cancel
-    { change: }
+    change_for_user = change
+    @total_amount = 0
+
+    { change: change_for_user }
   end
 
   private
