@@ -54,10 +54,12 @@ class VendingMachine
   def change
     return [] if @total_amount.zero?
 
-    change = []
     index = CoinValues::COIN_VALUES.count - 1
     current_amount = @total_amount
+    calculate_change([], current_amount, index)
+  end
 
+  def calculate_change(change, current_amount, index)
     while index >= 0
       coin_value = CoinValues::COIN_VALUES[index]
 
@@ -68,7 +70,6 @@ class VendingMachine
         index -= 1
       end
     end
-
     change
   end
 

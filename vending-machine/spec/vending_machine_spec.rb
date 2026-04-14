@@ -28,7 +28,10 @@ RSpec.describe VendingMachine do
 
     context 'when passing a not supported coin' do
       it 'raises CoinValueNotSupportedException' do
-        expect { machine.insert_coin(0) }.to raise_error(VendingMachine::CoinValueNotSupportedException, "Coin value '0' not supported.")
+        expect do
+          machine.insert_coin(0)
+        end.to raise_error(VendingMachine::CoinValueNotSupportedException,
+                           "Coin value '0' not supported.")
       end
     end
   end
@@ -75,7 +78,9 @@ RSpec.describe VendingMachine do
       it 'returns a hash with change and error message' do
         no_stock_machine.insert_coin(100)
         no_stock_machine.insert_coin(20)
-        expect(no_stock_machine.select_product('chips')).to eq({ change: [100, 20], message: "product 'chips' is out of stock.", status: :out_of_stock })
+        expect(no_stock_machine.select_product('chips')).to eq({ change: [100, 20],
+                                                                 message: "product 'chips' is out of stock.",
+                                                                 status: :out_of_stock })
       end
     end
 
@@ -100,20 +105,24 @@ RSpec.describe VendingMachine do
       it 'returns the coins and out_of_stock status' do
         no_stock_machine.insert_coin(100)
         no_stock_machine.insert_coin(20)
-        expect(no_stock_machine.select_product('chips')).to eq({ change: [100, 20], message: "product 'chips' is out of stock.", status: :out_of_stock })
+        expect(no_stock_machine.select_product('chips')).to eq({ change: [100, 20],
+                                                                 message: "product 'chips' is out of stock.",
+                                                                 status: :out_of_stock })
       end
     end
 
     context 'when the machine has no coins' do
       it 'returns empty change and error message' do
-        expect(machine.select_product('chips')).to eq({ change: [], message: 'not enough funds.', status: :insufficient_funds })
+        expect(machine.select_product('chips')).to eq({ change: [], message: 'not enough funds.',
+                                                        status: :insufficient_funds })
       end
     end
 
     context 'when the machine has not enough coins for the product' do
       it 'returns change and error message' do
         machine.insert_coin(100)
-        expect(machine.select_product('chips')).to eq({ change: [100], message: 'not enough funds.', status: :insufficient_funds })
+        expect(machine.select_product('chips')).to eq({ change: [100], message: 'not enough funds.',
+                                                        status: :insufficient_funds })
       end
     end
   end
