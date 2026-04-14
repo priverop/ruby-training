@@ -7,8 +7,9 @@ require_relative 'product'
 # Inventory: Array of Products.
 # Total_amount: Int, sum of the value of all the inserted coins. Default: 0
 class VendingMachine
-  class ProductErrorException < StandardError; end
+  class InsufficientFundsException < StandardError; end
   class NoStockException < StandardError; end
+  class ProductErrorException < StandardError; end
 
   attr_reader :total_amount
 
@@ -25,8 +26,7 @@ class VendingMachine
   end
 
   def select_product(name)
-    # TODO: out of stock
-    # TODO: not enough money
+    raise InsufficientFundsException, 'machine has no funds, please insert coins' unless @total_amount.positive?
 
     product = @inventory.find { |product| product.name == name }
 
@@ -34,8 +34,24 @@ class VendingMachine
     raise NoStockException, "product '#{name}' is out of stock." unless product.quantity.positive?
 
     product.quantity -= 1
+
+    raise InsufficientFundsException, "not enough founds, please insert #{product.price - @total_amount} more." if @total_amount < product.price
+
     @total_amount -= product.price
 
-    { product: product.name, change: [] }
+    { product: product.name, change: }
+  end
+
+  def cancel
+    { change: }
+  end
+
+  private
+
+  # TODO: algorithm for change
+  def change
+    return [] if @total_amount.zero?
+
+    [@total_amount]
   end
 end
