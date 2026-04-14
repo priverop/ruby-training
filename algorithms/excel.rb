@@ -11,7 +11,7 @@ class Excel
   def self.index(column)
     return encode(column) if column.size == 1
 
-    (index(column[0...-1]) * 26) + index(column.chars.last)
+    (index(column[0...-1]) * 26) + encode(column.chars.last)
   end
 
   def self.encode(letter)
