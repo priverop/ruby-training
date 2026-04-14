@@ -3,8 +3,6 @@
 require 'spec_helper'
 require_relative '../lib/vending_machine'
 
-# TODO: add before for coins
-
 RSpec.describe VendingMachine do
   let(:machine) do
     described_class.new(
@@ -28,13 +26,11 @@ RSpec.describe VendingMachine do
       end
     end
 
-    context 'when passing a not valid coin' do
+    context 'when passing a not supported coin' do
       it 'raises CoinValueNotSupportedException' do
         expect { machine.insert_coin(0) }.to raise_error(VendingMachine::CoinValueNotSupportedException, "Coin value '0' not supported.")
       end
     end
-
-    # TODO: when passing not an integer
   end
 
   describe '#select_product' do
