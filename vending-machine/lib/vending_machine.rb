@@ -13,9 +13,9 @@ class VendingMachine
 
   attr_reader :total_amount
 
-  def initialize(inventory:, total_amount: 0)
+  def initialize(inventory:)
     @inventory = inventory
-    @total_amount = total_amount
+    @total_amount = 0
   end
 
   def insert_coin(coin_value) # rubocop:disable Naming/PredicateMethod
