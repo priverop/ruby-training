@@ -8,7 +8,6 @@ require_relative 'product'
 # Total_amount: Int, sum of the value of all the inserted coins. Default: 0
 class VendingMachine
   class CoinValueNotSupportedError < StandardError; end
-  class NoStockError < StandardError; end
   class ProductErrorError < StandardError; end
 
   attr_reader :total_amount
@@ -18,13 +17,12 @@ class VendingMachine
     @total_amount = 0
   end
 
-  def insert_coin(coin_value) # rubocop:disable Naming/PredicateMethod
-    unless coin_value.is_a?(Integer) && CoinValues::COIN_VALUES.include?(coin_value)
+  def insert_coin(coin_value)
+    unless CoinValues::COIN_VALUES.include?(coin_value)
       raise CoinValueNotSupportedError, "Coin value '#{coin_value}' not supported."
     end
 
     @total_amount += coin_value
-    true
   end
 
   def select_product(name)

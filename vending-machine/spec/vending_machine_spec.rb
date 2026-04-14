@@ -16,10 +16,6 @@ RSpec.describe VendingMachine do
 
   describe '#insert_coin' do
     context 'when passing a valid coin' do
-      it 'returns true' do
-        expect(machine.insert_coin(100)).to be true
-      end
-
       it 'increases the total_amount of the machine' do
         machine.insert_coin(100)
         expect(machine.total_amount).to eq(100)
@@ -52,6 +48,14 @@ RSpec.describe VendingMachine do
 
         machine.select_product('chips')
         expect(machine.total_amount).to eq(0)
+      end
+    end
+
+    context 'when the name is valid, has stock, and more than enough amount inserted' do
+      it 'dispenses the product and returns change when overpaid' do
+        machine.insert_coin(200)
+        result = machine.select_product('chips')
+        expect(result).to eq({ product: 'chips', change: [50, 20, 10], status: :success })
       end
     end
 
