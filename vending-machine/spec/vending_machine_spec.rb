@@ -27,10 +27,10 @@ RSpec.describe VendingMachine do
     end
 
     context 'when passing a not supported coin' do
-      it 'raises CoinValueNotSupportedException' do
+      it 'raises CoinValueNotSupportedError' do
         expect do
           machine.insert_coin(0)
-        end.to raise_error(VendingMachine::CoinValueNotSupportedException,
+        end.to raise_error(VendingMachine::CoinValueNotSupportedError,
                            "Coin value '0' not supported.")
       end
     end
@@ -56,13 +56,13 @@ RSpec.describe VendingMachine do
     end
 
     context 'when there is no product with such name' do
-      it 'raises ProductErrorException' do
+      it 'raises ProductErrorError' do
         machine.insert_coin(100)
         machine.insert_coin(20)
 
         expect do
           machine.select_product('c')
-        end.to raise_error(VendingMachine::ProductErrorException, "product 'c' not found.")
+        end.to raise_error(VendingMachine::ProductErrorError, "product 'c' not found.")
       end
     end
 

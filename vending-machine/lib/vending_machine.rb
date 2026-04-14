@@ -7,9 +7,9 @@ require_relative 'product'
 # Inventory: Array of Products.
 # Total_amount: Int, sum of the value of all the inserted coins. Default: 0
 class VendingMachine
-  class CoinValueNotSupportedException < StandardError; end
-  class NoStockException < StandardError; end
-  class ProductErrorException < StandardError; end
+  class CoinValueNotSupportedError < StandardError; end
+  class NoStockError < StandardError; end
+  class ProductErrorError < StandardError; end
 
   attr_reader :total_amount
 
@@ -20,7 +20,7 @@ class VendingMachine
 
   def insert_coin(coin_value) # rubocop:disable Naming/PredicateMethod
     unless coin_value.is_a?(Integer) && CoinValues::COIN_VALUES.include?(coin_value)
-      raise CoinValueNotSupportedException, "Coin value '#{coin_value}' not supported."
+      raise CoinValueNotSupportedError, "Coin value '#{coin_value}' not supported."
     end
 
     @total_amount += coin_value
@@ -30,7 +30,7 @@ class VendingMachine
   def select_product(name)
     product = @inventory.find { |product| product.name == name }
 
-    raise ProductErrorException, "product '#{name}' not found." unless product
+    raise ProductErrorError, "product '#{name}' not found." unless product
     return out_of_stock(name) unless product.quantity.positive?
 
     return insufficient_funds if @total_amount < product.price
