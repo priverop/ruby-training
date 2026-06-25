@@ -23,7 +23,7 @@ class WordFrequencyAnalizer
   end
 
   def top_word
-    most_common(1).first.first
+    most_common(1).first.first unless most_common(1).empty?
   end
 
   def contains?(word)
@@ -33,7 +33,7 @@ class WordFrequencyAnalizer
   private
 
   def words
-    clean_string.downcase.split
+    @words ||= clean_string.downcase.split
   end
 
   def clean_string

@@ -48,6 +48,13 @@ RSpec.describe WordFrequencyAnalizer do
         expect(analyzer.top_word).to eq("the")
       end
     end
+
+    context "when giving an empty string" do
+      it "returns nil" do
+        analyzer = described_class.new("")
+        expect(analyzer.top_word).to be_nil
+      end
+    end
   end
 
   describe "#contains?" do
